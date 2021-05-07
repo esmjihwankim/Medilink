@@ -31,10 +31,6 @@ class S(object):
         return cls._instance
 
 def setServoPos(degree):
-    if degree > 180:
-        degree = 180
-    elif degree < 0:
-        degree = 0
     duty = S.SERVO_MIN_DUTY+(degree*(S.SERVO_MAX_DUTY-S.SERVO_MIN_DUTY)/180)
     servo.ChangeDutyCycle(duty)
 
@@ -67,12 +63,16 @@ def move_to_down():
 def move_to_right():
     print('right')
     S.motor_angle+=10
+    if S.motor_angle>180:
+        S.motor_angle=180
     setServoPos(S.motor_angle)
     return render_template('move.html')
 
 def move_to_left():
     print('left')
     S.motor_angle-=10
+    if S.motor_angle<0:
+        S.motor_angle=0
     setServoPos(S.motor_angle)
     return render_template('move.html')
 
