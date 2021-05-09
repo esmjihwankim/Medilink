@@ -7,15 +7,23 @@ from markupsafe import escape
 import RPi.GPIO as GPIO
 from time import sleep
 
+from board import SCL, SDA
+import busio
+
+from adafruit_pca9685 import PCA9685
+from adafruit_motor import servo
 """
 Initial Setup
 """
 app = Flask(__name__)
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(12, GPIO.OUT)
+# GPIO.setmode(GPIO.BOARD)
+# GPIO.setup(12, GPIO.OUT)
 
-servo = GPIO.PWM(12,50)
-servo.start(0)
+# servo = GPIO.PWM(12,50)
+# servo.start(0)
+i2c = busio.I2C(SCL, SDA)
+pca = PCA9685(i2c)
+pca.frequency = 50
 
 """
 APP.ROUTE
@@ -24,23 +32,36 @@ APP.ROUTE
 class S(object):
     _instance = None
 
-    SERVO_MAX_DUTY=12
-    SERVO_MIN_DUTY=3
-    motor_angle=0
-    
+    # SERVO_MAX_DUTY=12
+    # SERVO_MIN_DUTY=3
+    # motor_angle=0
+    servo1 = servo.Servo(pca.channel[1])
+    servo2 = servo.Servo(pca.channel[2])
+    servo3 = servo.Servo(pca.channel[3], min_pulse=100, max_pulse=2600)
+    servo1.angle = 40
+    servo2.angle = 120
+    servo3.angle = 60
+    time.sleep(0.05)
     def __new__(cls):
         if not hasattr(cls, 'instance'):
             cls._instance = super(Singleton, cls).__new__(cls)
         return cls._instance
 
-def setServoPos(degree):
-    if degree > 180:
-        degree = 180
-    elif degree < 0:
-        degree = 0
-    duty = S.SERVO_MIN_DUTY+(degree*(S.SERVO_MAX_DUTY-S.SERVO_MIN_DUTY)/180)
-    servo.ChangeDutyCycle(duty)
+def move_left_right(x):
+    angle3 = servo3.angle + x
+    if angle3 < 90 and angle3 > 35:
+        servo3.angle = angle3
+        time.sleep(0.05)
 
+def move_up_down(y):
+    angle1 = servo1.angle + y
+    angle2 = servo2.angle - y
+    if angle1 < 120 and angle1 > 30:
+        servo1.angle = angle1
+    if angle2 < 125 and angle2 > 35:
+        servo2.angle = angle2
+    time.sleep(0.05)
+    
 @app.route('/')
 def render_webapp_page():
     return render_template('webapp.html')
@@ -61,21 +82,21 @@ def move_to_dir(direction):
 
 def move_to_up():
     print('up')
+    move_up_down(2)
     return render_template('move.html')
 
 def move_to_down():
     print('down')
+    move_up_down(-2)
     return render_template('move.html')
 
 def move_to_right():
     print('right')
-    S.motor_angle+=10
-    setServoPos(S.motor_angle)
+    move_left_right(2)
     return render_template('move.html')
 
 def move_to_left():
     print('left')
-    S.motor_angle-=10
-    setServoPos(S.motor_angle)
+    move_left_right(-2)
     return render_template('move.html')
 
