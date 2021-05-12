@@ -5,7 +5,7 @@ from flask import Flask, url_for,render_template, redirect
 from markupsafe import escape
 
 import RPi.GPIO as GPIO
-from time import sleep
+import time
 
 from board import SCL, SDA
 import busio
@@ -16,7 +16,7 @@ from adafruit_motor import servo
 Initial Setup
 """
 app = Flask(__name__)
-GPIO.setmode(GPIO.BOARD)
+#GPIO.setmode(GPIO.BOARD)
 GPIO.setup(12, GPIO.OUT)   # LED control pin
 
 i2c = busio.I2C(SCL, SDA)
@@ -28,7 +28,7 @@ servo3 = servo.Servo(pca.channels[3], min_pulse=100, max_pulse=2600)
 servo4 = servo.Servo(pca.channels[4])
 servo5 = servo.Servo(pca.channels[5])
 servo6 = servo.Servo(pca.channels[6])
-servo7 = servo.Servo(pca.channels[7])
+servo7 = servo.Servo(pca.channels[7], min_pulse=100, max_pulse=2600)
 """
 initial angle
 """
@@ -58,9 +58,9 @@ def move_left_right(x):
     angle7 = servo7.angle + x
     if angle3 < 90 and angle3 > 35:
         servo3.angle = angle3
-    if angle7 < 80 and angle7 > 25:
+    if angle7 < 150 and angle7 > 0:
         servo7.angle = angle7
-    time.sleep(0.05)
+    time.sleep(0.01)
 
 
 def move_up_down(y):
@@ -110,21 +110,21 @@ def move_to_dir(direction):
 
 def move_to_up():
     print('up')
-    move_up_down(2)
+    move_up_down(5)
     return render_template('move.html')
 
 def move_to_down():
     print('down')
-    move_up_down(-2)
+    move_up_down(-5)
     return render_template('move.html')
 
 def move_to_right():
     print('right')
-    move_left_right(2)
+    move_left_right(5)
     return render_template('move.html')
 
 def move_to_left():
     print('left')
-    move_left_right(-2)
+    move_left_right(-5)
     return render_template('move.html')
 
