@@ -52,6 +52,7 @@ class S(object):
             cls._instance = super(Singleton, cls).__new__(cls)
         return cls._instance
 
+
 def move_left_right(x):
     angle3 = servo3.angle + x
     angle7 = servo7.angle + x
@@ -60,6 +61,7 @@ def move_left_right(x):
     if angle7 < 80 and angle7 > 25:
         servo7.angle = angle7
     time.sleep(0.05)
+
 
 def move_up_down(y):
     angle1 = servo1.angle + y
