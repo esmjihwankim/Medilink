@@ -94,37 +94,35 @@ def move_up_down(y):
 def render_webapp_page():
     return render_template('webapp.html')
 
-
-@app.route('/move/<direction>', methods = ['POST'])
-def move_to_dir(direction):
+# Right Arm
+@app.route('/move/rightarm/<direction>', methods = ['POST'])
+def leftarm_move_to_dir(direction):
     if direction == 'up':
-        return move_to_up()
+        move_up_down(5)
     elif direction == 'down':
-        return move_to_down()
+        move_up_down(-5)
     elif direction == 'right':
-        return move_to_right()
+        move_left_right(5)
     elif direction == 'left':
-        return move_to_left()
+        move_left_right(-5)
     else:
         return
-
-def move_to_up():
-    print('up')
-    move_up_down(5)
     return render_template('move.html')
 
-def move_to_down():
-    print('down')
-    move_up_down(-5)
-    return render_template('move.html')
+# Left Arm
+@app.route('/move/leftarm/<direction>', methods = ['POST'])
+def rightarm_move_to_dir(direction):
+    if direction == 'up':
+        return
+    elif direction == 'down':
+        return
+    elif direction == 'right':
+        return
+    elif direction == 'left':
+        return
+    return render_template('move.html') 
 
-def move_to_right():
-    print('right')
-    move_left_right(5)
+# Medical Light 
+@app.route('/light/', methods = ['POST'])
+def light_on():
     return render_template('move.html')
-
-def move_to_left():
-    print('left')
-    move_left_right(-5)
-    return render_template('move.html')
-
