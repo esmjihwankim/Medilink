@@ -46,49 +46,47 @@ APP.ROUTE
 """
 class S(object):
     _instance = None
-
+    led_on = False
     def __new__(cls):
         if not hasattr(cls, 'instance'):
             cls._instance = super(Singleton, cls).__new__(cls)
         return cls._instance
 
 
-def move_left_right(x):
+def leftarm_move_left_right(x):
     angle3 = servo3.angle + x
-    angle7 = servo7.angle + x
     if angle3 < 90 and angle3 > 35:
         servo3.angle = angle3
+        time.sleep(0.01)
+
+def rightarm_move_left_right(x):
+    angle7 = servo7.angle + x
     if angle7 < 150 and angle7 > 0:
         servo7.angle = angle7
-    time.sleep(0.01)
+        time.sleep(0.01)
 
-
-def move_up_down(y):
+def leftarm_move_up_down(y):
     angle1 = servo1.angle + y
     angle2 = servo2.angle - y
-    if servo5.angle > 60:
-        angle4 = servo4.angle
-        angle5 = servo5.angle - y
-        angle6 = servo6.angle - y
-    else :
-    #elif servo5.angle > 30:
-        angle4 = servo4.angle
-        angle5 = servo5.angle - 1.5 * y
-        angle6 = servo6.angle - y
-    #else :
-    #    angle4 = servo4.angle + y
-    #    angle5 = servo5.angle
-    #    angle6 = servo6.angle
-    
     if angle1 < 120 and angle1 > 30:
         servo1.angle = angle1
     if angle2 < 125 and angle2 > 35:
         servo2.angle = angle2
+    time.sleep(0.01)
+
+def rightarm_move_up_down(y):
+    if servo5.angle > 60:
+        angle5 = servo5.angle - y
+        angle6 = servo6.angle - y
+    else :
+        angle5 = servo5.angle - 1.5 * y
+        angle6 = servo6.angle - y
+    
     if angle5 < 95 and angle5 > 5:
         servo5.angle = angle5
     if angle6 < 125 and angle6 > 55:
         servo6.angle = angle6
-    time.sleep(0.05)
+    time.sleep(0.01)
     
 @app.route('/')
 def render_webapp_page():
@@ -98,13 +96,13 @@ def render_webapp_page():
 @app.route('/move/rightarm/<direction>', methods = ['POST'])
 def leftarm_move_to_dir(direction):
     if direction == 'up':
-        move_up_down(5)
+        leftarm_move_up_down(5)
     elif direction == 'down':
-        move_up_down(-5)
+        leftarm_move_up_down(-5)
     elif direction == 'right':
-        move_left_right(5)
+        leftarm_move_left_right(5)
     elif direction == 'left':
-        move_left_right(-5)
+        leftarm_move_left_right(-5)
     else:
         return
     return render_template('move.html')
@@ -113,16 +111,20 @@ def leftarm_move_to_dir(direction):
 @app.route('/move/leftarm/<direction>', methods = ['POST'])
 def rightarm_move_to_dir(direction):
     if direction == 'up':
-        return
+        rightarm_move_up_down(5)
     elif direction == 'down':
-        return
+        rightarm_move_up_down(-5)
     elif direction == 'right':
-        return
+        rightarm_move_left_right(5)
     elif direction == 'left':
-        return
+        rightarm_move_left_right(-5)
     return render_template('move.html') 
 
 # Medical Light 
 @app.route('/light/', methods = ['POST'])
 def light_on():
+    if S.led_on == False:
+        GPIO.output(12, GPIO.HIGH)
+    elif :
+        GPIO.output(12, GPIO.LOW) 
     return render_template('move.html')
