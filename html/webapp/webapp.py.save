@@ -12,60 +12,54 @@ import busio
 
 from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
-import sys
-
-print(sys.version)
-
 """
 Initial Setup
 """
 app = Flask(__name__)
-GPIO.cleanup()
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(18, GPIO.OUT)   # LED control pin
+#GPIO.setmode(GPIO.BOARD)
+#GPIO.setup(12, GPIO.OUT)   # LED control pin
 
 i2c = busio.I2C(SCL, SDA)
 pca = PCA9685(i2c)
 pca.frequency = 50
 servo1 = servo.Servo(pca.channels[1])
 time.sleep(0.05)
-servo2 = servo.Servo(pca.channels[3])
+servo2 = servo.Servo(pca.channels[2])
 time.sleep(0.05)
-servo3 = servo.Servo(pca.channels[5], min_pulse=100, max_pulse=2600)
+servo3 = servo.Servo(pca.channels[3], min_pulse=100, max_pulse=2600)
 time.sleep(0.05)
-#servo4 = servo.Servo(pca.channels[4])
+# servo4 = servo.Servo(pca.channels[4])
 #time.sleep(0.05)
-relay = pca.channels[15]
-servo5 = servo.Servo(pca.channels[8])
-time.sleep(0.05)
-servo6 = servo.Servo(pca.channels[10])
-time.sleep(0.05)
-servo7 = servo.Servo(pca.channels[12], min_pulse=100, max_pulse=2600)
-time.sleep(0.05)
+#servo5 = servo.Servo(pca.channels[12])
+#time.sleep(0.05)
+#servo6 = servo.Servo(pca.channels[13])
+#time.sleep(0.05)
+#servo7 = servo.Servo(pca.channels[14], min_pulse=100, max_pulse=2600)
+#time.sleep(0.05)
 
 """
 initial angle
 """
-servo1.angle = 80 # originally 40
+servo1.angle = 40 # originally 40
 servo2.angle = 120
 time.sleep(0.05)
 servo3.angle = 60
 time.sleep(0.05)
-#servo4.angle = 90
+# servo4.angle = 90
+# time.sleep(0.05)
+#servo5.angle = 90
 #time.sleep(0.05)
-servo5.angle = 90
-time.sleep(0.05)
-servo6.angle = 120
-time.sleep(0.05)
-servo7.angle = 70
-time.sleep(0.05)
+#servo6.angle = 120
+#time.sleep(0.05)
+#servo7.angle = 70
+#time.sleep(0.05)
 #GPIO.output(12, GPIO.HIGH)
 """
 APP.ROUTE
 """
 class S(object):
     _instance = None
-    led_on = False
+    led_on = True
     def __new__(cls):
         if not hasattr(cls, 'instance'):
             cls._instance = super(Singleton, cls).__new__(cls)
@@ -79,31 +73,32 @@ def leftarm_move_left_right(x):
         time.sleep(0.01)
 
 def rightarm_move_left_right(x):
-    angle7 = servo7.angle + x
-    if angle7 < 150 and angle7 > 0:
-        servo7.angle = angle7
+#    angle7 = servo7.angle + x
+#    if angle7 < 150 and angle7 > 0:
+#        servo7.angle = angle7
         time.sleep(0.01)
 
 def leftarm_move_up_down(y):
     angle1 = servo1.angle + y
-    angle2 = servo2.angle + y
-    if angle1 < 140 and angle1 > 30:
+    angle2 = servo2.angle - y
+    if angle1 < 120 and angle1 > 30:
         servo1.angle = angle1
-    if angle2 < 145 and angle2 > 35:
+    if angle2 < 125 and angle2 > 35:
         servo2.angle = angle2
     time.sleep(0.01)
 
 def rightarm_move_up_down(y):
-    if servo5.angle > 60:
-        angle5 = servo5.angle - y
-        angle6 = servo6.angle - y
-    else :
-        angle5 = servo5.angle - 1.5 * y
-        angle6 = servo6.angle - y
-    if angle5 < 95 and angle5 > 5:
-        servo5.angle = angle5
-    if angle6 < 125 and angle6 > 55:
-        servo6.angle = angle6
+#    if servo5.angle > 60:
+#        angle5 = servo5.angle - y
+#        angle6 = servo6.angle - y
+#    else :
+#        angle5 = servo5.angle - 1.5 * y
+#        angle6 = servo6.angle - y
+    
+#    if angle5 < 95 and angle5 > 5:
+#        servo5.angle = angle5
+#    if angle6 < 125 and angle6 > 55:
+#        servo6.angle = angle6
     time.sleep(0.01)
     
 @app.route('/')
@@ -142,9 +137,7 @@ def rightarm_move_to_dir(direction):
 @app.route('/light/', methods = ['POST'])
 def light_on():
     if S.led_on == False:
-        GPIO.output(18, GPIO.HIGH)
-        S.led_on = True
+#       GPIO.output(12, GPIO.HIGH)
     else:
-        GPIO.output(18, GPIO.LOW)
-        S.led_on = False
+#       GPIO.output(12, GPIO.LOW) 
     return render_template('move.html')
